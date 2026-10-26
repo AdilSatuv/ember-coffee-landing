@@ -13,13 +13,22 @@ export const coffeeProfiles = {
   ethiopia: { processing: "Мытая", roast: "Светлая / фильтр", acidity: 4, body: 2, brewing: "Воронка, капельная кофеварка, чёрный кофе", story: "Концепция этого лота — прозрачная чашка с цветочными и фруктовыми ассоциациями. Выразительный вариант для медленного знакомства со вкусом.", tip: "Начни с воронки 18 г → 300 мл. Если чашка кажется слишком резкой, попробуй чуть мельче помол и сравни результат." },
   colombia: { processing: "Мытая", roast: "Средняя / универсальная", acidity: 3, body: 3, brewing: "Воронка, френч-пресс, эспрессо", story: "Идея лота — соединить сочность яблока со спокойной сладостью какао. Универсальный характер для тех, кто меняет способ приготовления под настроение.", tip: "Попробуй френч-пресс 20 г → 320 мл или воронку. Сравни одну и ту же чашку горячей и немного остывшей." },
 };
+export function rankCoffees({method,milk,taste}) {
+ if (!["filter","espresso","french"].includes(method) || !["black","milk"].includes(milk) || !["chocolate","fruit","balance"].includes(taste)) throw new RangeError("Incomplete taste preferences");
+ const tasteId={chocolate:'brasil',fruit:'ethiopia',balance:'colombia'}[taste];
+ const methodId={espresso:'brasil',filter:'ethiopia',french:'colombia'}[method];
+ const milkId=milk==='milk'?'brasil':'ethiopia';
+ return coffees.map((coffee,index)=>{const breakdown={taste:coffee.id===tasteId?3:0,method:coffee.id===methodId?2:0,milk:coffee.id===milkId?(milk==='milk'?2:1):0};return {coffee,index,breakdown,score:breakdown.taste+breakdown.method+breakdown.milk};}).sort((a,b)=>b.score-a.score||a.index-b.index);
+}
+export function compareCoffees(answers) {
+ const ranking=rankCoffees(answers),alternative=ranking[1];
+ const values={method:[['filter','воронка / фильтр'],['espresso','эспрессо-машина'],['french','френч-пресс']],milk:[['black','чёрный кофе'],['milk','кофе с молоком']],taste:[['chocolate','шоколад и орехи'],['fruit','фрукты и цветы'],['balance','сладкий баланс']]};
+ let change=null;
+ for(const [key,options]of Object.entries(values))for(const [value,label]of options)if(!change&&value!==answers[key]&&rankCoffees({...answers,[key]:value})[0].coffee.id===alternative.coffee.id)change={key,value,label};
+ return {best:ranking[0],alternative,tied:ranking[0].score===alternative.score,change};
+}
 export function recommendCoffee({ method, milk, taste }) {
-  if (!["filter","espresso","french"].includes(method) || !["black","milk"].includes(milk) || !["chocolate","fruit","balance"].includes(taste)) throw new RangeError("Incomplete taste preferences");
-  const scores = { brasil: 0, ethiopia: 0, colombia: 0 };
-  scores[{ chocolate:"brasil", fruit:"ethiopia", balance:"colombia" }[taste]] += 3;
-  scores[method === "espresso" ? "brasil" : method === "filter" ? "ethiopia" : "colombia"] += 2;
-  scores[milk === "milk" ? "brasil" : "ethiopia"] += milk === "milk" ? 2 : 1;
-  const id = Object.keys(scores).sort((a,b) => scores[b] - scores[a])[0];
+  const id = rankCoffees({method,milk,taste})[0].coffee.id;
   const flavour = { chocolate: "шоколад и орехи", fruit: "фрукты и цветы", balance: "сладкий баланс" }[taste];
   const reasons = [id === "brasil" ? "У «Тёплого берега» плотная шоколадно-ореховая основа: она подходит и для эспрессо, и для добавления молока." : id === "ethiopia" ? "«Солнечная сторона» — лёгкий фруктово-цветочный профиль, который интересно раскрывать в чёрной чашке." : "«Длинный разговор» соединяет сочность и сладость; это спокойная середина между классикой и яркими открытиями.", "Твой вкусовой ориентир — «" + flavour + "». Мы также учли способ приготовления и молоко, поэтому выбор может быть компромиссом между тремя ответами.", method === "filter" ? "Воронка поможет рассмотреть отдельные оттенки чашки." : method === "espresso" ? "Для эспрессо начни с базового рецепта и подстрой помол под выбранный лот." : "Френч-пресс подчеркнёт тело и плотность напитка.", milk === "milk" ? "Молоко смягчит кислотность и часть тонких нот: попробуй маленькую чёрную чашку для сравнения." : "Без молока будет проще почувствовать собственный характер зерна."];
 
