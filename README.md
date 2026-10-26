@@ -1,2 +1,22 @@
-# ember-coffee-landing
-Specialty coffee portfolio concept — Next.js, SCSS Modules, Framer Motion
+# EMBER — авторский портфолио-концепт
+
+Next.js App Router, React, SCSS Modules, Framer Motion, Lucide. Статический экспорт без сервера и внешней отправки форм.
+
+## Архитектура
+
+- app/: серверная композиция, локальные шрифты, metadata и базовые стили.
+- components/Landing.jsx: семантические секции и навигация.
+- components/CoffeeLab.jsx: ограниченные клиентские взаимодействия.
+- content/: данные и чистые функции, проверяемые через node:test.
+- tests/browser/: desktop/mobile Chromium и axe.
+- scripts/: gzip-сервер для лабораторного Lighthouse и сводка метрик.
+
+## Запуск
+
+npm ci, npm run dev. Сборка: npm run build, результат в out/. npm test — логика, npm run test:e2e — браузерные сценарии (в CI с Python3).
+
+## Дизайн и прозрачность
+
+Упаковка нарисована кодом. Фото обжарки: Pete Willis, Unsplash, https://unsplash.com/photos/brown-seeds-nkIgu4Mh7xc. Фильтры вкуса и веса, выбор лота, рецепты и демонстрационная подписка.
+
+Бренд вымышленный; характеристики, ассортимент и цены демонстрационные. Нет реальных заказов, бронирований, платежей и сохранения адресов. Приватная демоверсия закрыта от индексации. Для публичного запуска нужны постоянный домен и пересмотр robots. Анимации учитывают reduced motion.
