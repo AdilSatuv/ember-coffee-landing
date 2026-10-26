@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import { ArrowUpRight, ArrowRight, Check } from "lucide-react";
-import { coffees, coffeePrice, recipes } from "../content/coffee";
+import { coffees, coffeePrice, recipes, scaleRecipe, recipeText } from "../content/coffee";
+import { downloadText } from "../lib/download";
 import CoffeeBag from "./CoffeeBag";
 import s from "./Landing.module.scss";
 export function Collection() {
@@ -22,8 +23,8 @@ export function Collection() {
   </section>;
 }
 export function BrewGuide() {
-  const [method,setMethod]=useState("filter");const recipe=recipes[method];
-  return <section id="brew" className={s.brew}><div><span className={s.eyebrow}>03 / МАЛЕНЬКИЙ ЕЖЕДНЕВНЫЙ РИТУАЛ</span><h2>Хороший кофе.<br /><em>Твои правила.</em></h2><p>Немного внимания — и любимая чашка дома.<br />Начни с рецепта, а дальше доверься вкусу.</p><div className={s.brewMethods} role="group" aria-label="Способ приготовления">{Object.entries(recipes).map(([id,item])=><button key={id} aria-pressed={method===id} onClick={()=>setMethod(id)}>{item.label}<ArrowRight size={17}/></button>)}</div></div><div className={s.recipe} aria-live="polite"><div className={s.recipeTop}><span>РЕЦЕПТ / {recipe.label.toUpperCase()}</span><span>↗</span></div><div className={s.recipeStats}><div><strong>{recipe.dose}</strong><span>КОФЕ</span></div><div><strong>{recipe.water}</strong><span>ВОДА / ВЫХОД</span></div><div><strong>{recipe.time}</strong><span>ВРЕМЯ</span></div></div><p>{recipe.grind} · вода 92–96 °C для воронки и френч-пресса</p><ol>{recipe.steps.map(step=><li key={step}>{step}</li>)}</ol><small>Базовые ориентиры. Результат зависит от зерна, воды и оборудования.</small></div></section>;
+  const [method,setMethod]=useState("filter");const [cups,setCups]=useState(1);const recipe=scaleRecipe(method,cups);
+  return <section id="brew" className={s.brew}><div><span className={s.eyebrow}>03 / МАЛЕНЬКИЙ ЕЖЕДНЕВНЫЙ РИТУАЛ</span><h2>Хороший кофе.<br /><em>Твои правила.</em></h2><p>Немного внимания — и любимая чашка дома.<br />Начни с рецепта, а дальше доверься вкусу.</p><div className={s.brewMethods} role="group" aria-label="Способ приготовления">{Object.entries(recipes).map(([id,item])=><button key={id} aria-pressed={method===id} onClick={()=>setMethod(id)}>{item.label}<ArrowRight size={17}/></button>)}</div></div><div className={s.recipe} aria-live="polite"><div className={s.recipeTop}><span>РЕЦЕПТ / {recipe.label.toUpperCase()}</span><span>↗</span></div><label className={s.portions} htmlFor="brew-portions">Количество чашек<select id="brew-portions" value={recipe.portions} disabled={method==="espresso"} onChange={event=>setCups(Number(event.target.value))}>{[1,2,3].map(value=><option key={value} value={value}>{value}</option>)}</select></label>{method==="espresso"&&<p>Для эспрессо указан рецепт одной порции.</p>}<div className={s.recipeStats}><div><strong>{recipe.dose}</strong><span>КОФЕ</span></div><div><strong>{recipe.water}</strong><span>ВОДА / ВЫХОД</span></div><div><strong>{recipe.time}</strong><span>ВРЕМЯ</span></div></div><p>{recipe.grind} · вода 92–96 °C для воронки и френч-пресса</p><ol>{recipe.steps.map(step=><li key={step}>{step}</li>)}</ol><small>Базовые ориентиры. Для большого объёма отрегулируй помол и время. Результат зависит от зерна, воды и оборудования.</small><button className={s.recipeDownload} onClick={()=>downloadText("ember-brew-recipe.txt",recipeText(method,cups))}>Скачать рецепт ↓</button></div></section>;
 }
 export function CoffeeClub() {
   const [email,setEmail]=useState("");const [message,setMessage]=useState("");
