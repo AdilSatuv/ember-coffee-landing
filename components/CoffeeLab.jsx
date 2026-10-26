@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { ArrowUpRight, ArrowRight, Check } from "lucide-react";
-import { coffees, coffeePrice, recipes, scaleRecipe, recipeText } from "../content/coffee";
+import { coffees, coffeePrice, coffeeProfiles, recipes, scaleRecipe, recipeText } from "../content/coffee";
 import { downloadText } from "../lib/download";
 import CoffeeBag from "./CoffeeBag";
 import s from "./Landing.module.scss";
@@ -13,10 +13,10 @@ export function Collection() {
     <div className={s.sectionTop}><span>01 / КОФЕ С ХАРАКТЕРОМ</span><span>ТРИ НАСТРОЕНИЯ. ОДНО ТВОЁ.</span></div>
     <div className={s.sectionHeading}><h2 id="collection-title">Какое у тебя<br /><em>сегодня утро?</em></h2><p>Выбирай не по сложным словам.<br />Выбирай по тому, что любишь.</p></div>
     <div className={s.filters}><div role="group" aria-label="Вкус кофе">{[["all","Весь кофе"],["classic","Люблю классику"],["bright","Хочу ярче"],["balanced","Ищу баланс"]].map(([id,label])=><button key={id} aria-pressed={mood===id} onClick={()=>setMood(id)}>{label}</button>)}</div><div role="group" aria-label="Вес упаковки">{[250,1000].map(value=><button key={value} aria-pressed={weight===value} onClick={()=>setWeight(value)}>{value===250?"250 г":"1 кг"}</button>)}</div></div>
-    <div className={s.products}>{coffees.filter(coffee=>mood==="all"||coffee.mood===mood).map(coffee=><article key={coffee.id} className={s.product}>
+    <div className={s.products}>{coffees.filter(coffee=>mood==="all"||coffee.mood===mood).map(coffee=><article key={coffee.id} id={`lot-${coffee.id}`} className={s.product}>
       <div className={s.productVisual} style={{"--wash":coffee.color+"22"}}><CoffeeBag {...coffee} /><span className={s.roundStamp}>100%<br />АРАБИКА</span></div>
       <div className={s.productMeta}><span>{coffee.origin}</span><span>{weight===250?"250 Г":"1 КГ"}</span></div><h3>{coffee.name}</h3><p>{coffee.notes}</p>
-      <button className={s.productButton} onClick={()=>setChosen({...coffee,weight})}>Выбрать — {Math.round(coffeePrice(coffee.id,weight)).toLocaleString("ru-RU")} ₽<ArrowUpRight size={19}/></button>
+      <details className={s.lotDetails}><summary>Подробнее о лоте «{coffee.name}» <span>+</span></summary><p>{coffeeProfiles[coffee.id].story}</p><dl><div><dt>Обработка</dt><dd>{coffeeProfiles[coffee.id].processing}</dd></div><div><dt>Обжарка</dt><dd>{coffeeProfiles[coffee.id].roast}</dd></div><div><dt>Подходит для</dt><dd>{coffeeProfiles[coffee.id].brewing}</dd></div></dl>{[["acidity","Кислотность"],["body","Плотность"]].map(([key,label])=><div className={s.profileMeter} key={key}><label htmlFor={coffee.id+key}>{label}</label><meter id={coffee.id+key} min="0" max="5" value={coffeeProfiles[coffee.id][key]} aria-valuetext={coffeeProfiles[coffee.id][key]+" из 5"}/><span>{coffeeProfiles[coffee.id][key]} / 5</span></div>)}<p>{coffeeProfiles[coffee.id].tip}</p><small>Демонстрационный профиль вымышленного лота. Оценки условные.</small></details><button className={s.productButton} onClick={()=>setChosen({...coffee,weight})}>Выбрать — {Math.round(coffeePrice(coffee.id,weight)).toLocaleString("ru-RU")} ₽<ArrowUpRight size={19}/></button>
     </article>)}</div>
     <p className={s.resultCount} aria-live="polite">Лотов в подборке: {coffees.filter(coffee=>mood==="all"||coffee.mood===mood).length}</p>
     {chosen&&<aside className={s.selection} aria-live="polite"><Check size={22}/><div><strong>{chosen.name} / {chosen.weight===250?"250 г":"1 кг"}</strong><p>{chosen.description} Это демо: заказ не оформляется.</p></div><button onClick={()=>setChosen(null)} aria-label="Закрыть выбранный кофе">Закрыть</button></aside>}
