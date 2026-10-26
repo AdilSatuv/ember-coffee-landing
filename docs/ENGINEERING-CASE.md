@@ -26,3 +26,7 @@ content/coffee.js → чистая recommendCoffee → три группы radio
 Бренд, цены и лоты демонстрационные. Вкусовые шкалы иллюстративны, модель не основана на дегустационном исследовании. Нет заказа, оплаты или отправки email. Это алгоритм с правилами, без AI-сервиса.
 
 Публичная страница: /case-study/
+
+
+## Interaction pass
+A new contextual interaction is covered by pure-function tests and browser scenarios. The CI resource-budget check constrains compressed home JS/HTML and raster sizes; it does not silently raise limits. Videos are recorded from the real static builds in CI, without audio or personal data. Physical phones remain untested.
