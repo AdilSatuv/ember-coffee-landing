@@ -13,3 +13,13 @@ export function coffeePrice(id, weight) {
   if (!coffee || ![250, 1000].includes(weight)) throw new RangeError("Unknown coffee or weight");
   return weight === 250 ? coffee.price : coffee.price * 3.4;
 }
+export function scaleRecipe(method, cups) {
+  if (!Object.hasOwn(recipes, method) || ![1,2,3].includes(cups)) throw new RangeError("Unknown recipe or portions");
+  const base = recipes[method], portions = method === "espresso" ? 1 : cups;
+  if (method === "espresso") return { ...base, portions };
+  return { ...base, portions, dose: `${parseInt(base.dose) * portions} г`, water: `${parseInt(base.water) * portions} мл`, steps: base.steps.map(step => step.replace("50 мл", `${50 * portions} мл`).replace("300 мл", `${300 * portions} мл`)) };
+}
+export function recipeText(method, cups) {
+  const item = scaleRecipe(method, cups);
+  return ["EMBER / ТВОЙ КОФЕЙНЫЙ РИТУАЛ", item.label, `Порций: ${item.portions}`, `Кофе: ${item.dose}`, `Вода / выход: ${item.water}`, `Время: ${item.time}`, item.grind, "", ...item.steps.map((step,index) => `${index+1}. ${step}`), "", "Базовый рецепт. Отрегулируй помол и время под зерно и оборудование."].join("\n");
+}
